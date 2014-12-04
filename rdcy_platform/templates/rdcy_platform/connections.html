@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+{% load custom_tags %}
+
+{% block content %}
+    
+    {% for service in object_list %}
+        <div>
+            <form action="{% url 'api_connection_create' %}" data-service="{{ service.id }}">
+                <p>{{ service.name }}</p>
+                <label>
+                    Active
+                    <input class="is_active_checkbox" type="checkbox" name="is_active" 
+                        {% if service.serviceconnection_set.first.is_active %}
+                            checked="checked"
+                        {% endif %} 
+                    />
+                </label>
+                <label>
+                    Number of Articles
+                    <select name="num_articles">
+                        {% for i in 10|get_range %}
+                            <option value="{{ i }}"
+                                {% if service.serviceconnection_set.first.num_articles == i %}
+                                    selected="selected"
+                                {% endif %}
+                            >{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                
+            </form>
+        </div>
+    {% endfor %}
+
+{% endblock content %}
+
+
+{% block javascript %}
+    <script>
+        $('form .is_active_checkbox').click(function(){
+            var $form = $(this.form);
+
+            var url = $form.attr('action');
+            var service_id = $form.data('service');
+            var is_active = $(this).prop('checked');
+            var num_articles = $('select', $form).val();
+
+            $.post(url, {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                service_id: service_id,
+                is_active: is_active,
+                num_articles: num_articles
+            })
+            .done(function(data){
+                console.log(data);
+            })
+            .fail(function( jqXHR, textStatus, errorThrown ){
+                console.log(jqXHR.responseText);
+            });
+        });
+    </script>
+
+{% endblock javascript%}

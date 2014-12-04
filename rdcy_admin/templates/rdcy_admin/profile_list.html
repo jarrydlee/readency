@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+    <h2>Profiles</h2>
+    <ul>
+        {% for profile in profile_list %}
+            <li>{{ profile.access_token }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
